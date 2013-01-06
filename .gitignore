@@ -1,3 +1,6 @@
 *.class
 *.jar
 .DS_Store
+build/
+dist/
+nbproject/private/
