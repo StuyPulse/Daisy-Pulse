@@ -169,6 +169,7 @@ public class DaisyCVWidget extends WPICameraExtension
             linePt2 = new WPIPoint(size.width()/2+horizontalOffsetPixels,0);
         }
 
+
         // Get the raw IplImages for OpenCV
         IplImage input = DaisyExtensions.getIplImage(rawImage);
 
@@ -180,8 +181,19 @@ public class DaisyCVWidget extends WPICameraExtension
         // Hue
         // NOTE: Red is at the end of the color space, so you need to OR together
         // a thresh and inverted thresh in order to get points that are red
-        opencv_imgproc.cvThreshold(hue, bin, 60-15, 255, opencv_imgproc.CV_THRESH_BINARY);
-        opencv_imgproc.cvThreshold(hue, hue, 60+15, 255, opencv_imgproc.CV_THRESH_BINARY_INV);
+        int targetValue = 50;
+        int variance = 30;
+        opencv_imgproc.cvThreshold(hue, bin, targetValue-variance, 255, opencv_imgproc.CV_THRESH_BINARY);
+        opencv_imgproc.cvThreshold(hue, hue, targetValue+variance, 255, opencv_imgproc.CV_THRESH_BINARY_INV);
+
+        //opencv_core.cvNot(bin, bin);
+        //opencv_core.cvNot(hue, hue);
+
+        CanvasFrame postNotBin = new CanvasFrame("PostNotBin");
+        postNotBin.showImage(bin.getBufferedImage());
+
+        CanvasFrame postNotHue = new CanvasFrame("PostNotHue");
+        postNotHue.showImage(hue.getBufferedImage());
 
         // Saturation
         opencv_imgproc.cvThreshold(sat, sat, 250, 255, opencv_imgproc.CV_THRESH_BINARY);
@@ -192,31 +204,35 @@ public class DaisyCVWidget extends WPICameraExtension
         // Combine the results to obtain our binary image which should for the most
         // part only contain pixels that we care about
         opencv_core.cvAnd(hue, bin, bin, null);
+
+        CanvasFrame asdf = new CanvasFrame("prepostbinthing");
+        asdf.showImage(bin.getBufferedImage());
+
         opencv_core.cvOr(bin, sat, bin, null);
         opencv_core.cvOr(bin, val, bin, null);
 
-        CanvasFrame hsvas = new CanvasFrame("hsv");
-        hsvas.showImage(hsv.getBufferedImage());
+        //CanvasFrame hsvas = new CanvasFrame("hsv");
+        //hsvas.showImage(hsv.getBufferedImage());
 
-        CanvasFrame hueas = new CanvasFrame("hue");
-        hueas.showImage(hue.getBufferedImage());
+        //CanvasFrame hueas = new CanvasFrame("hue");
+        //hueas.showImage(hue.getBufferedImage());
 
-        CanvasFrame satas = new CanvasFrame("sat");
-        satas.showImage(sat.getBufferedImage());
+        //CanvasFrame satas = new CanvasFrame("sat");
+        //satas.showImage(sat.getBufferedImage());
 
-        CanvasFrame valas = new CanvasFrame("val");
-        valas.showImage(val.getBufferedImage());
+        //CanvasFrame valas = new CanvasFrame("val");
+        //valas.showImage(val.getBufferedImage());
 
-        // Uncomment the next two lines to see the raw binary image
-        CanvasFrame result = new CanvasFrame("binary");
-        result.showImage(bin.getBufferedImage());
+        //// Uncomment the next two lines to see the raw binary image
+        //CanvasFrame result = new CanvasFrame("binary");
+        //result.showImage(bin.getBufferedImage());
 
         // Fill in any gaps using binary morphology
         opencv_imgproc.cvMorphologyEx(bin, bin, null, morphKernel, opencv_imgproc.CV_MOP_CLOSE, kHoleClosingIterations);
 
-        // Uncomment the next two lines to see the image post-morphology
-        CanvasFrame result2 = new CanvasFrame("morph");
-        result2.showImage(bin.getBufferedImage());
+        //// Uncomment the next two lines to see the image post-morphology
+        //CanvasFrame result2 = new CanvasFrame("morph");
+        //result2.showImage(bin.getBufferedImage());
 
         // Find contours
         WPIBinaryImage binWpi = DaisyExtensions.makeWPIBinaryImage(bin);
