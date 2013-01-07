@@ -23,6 +23,11 @@ import java.util.Scanner;
 import java.util.TreeMap;
 import javax.imageio.ImageIO;
 
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.awt.image.BufferedImage;
+import java.awt.Color;
+
 /* HOW TO GET THIS COMPILING IN NETBEANS:
  *  1. Install the SmartDashboard using the installer (if on Windows)
  *      1a. Verify that the OpenCV libraries are in your PATH (on Windows)
@@ -170,8 +175,43 @@ public class DaisyCVWidget extends WPICameraExtension
         }
 
 
+
+        WritableRaster r = (WritableRaster) rawImage.getBufferedImage().getData(); //We need this to write to/from an image
+
+        for (int i = 0; i < r.getWidth(); i++) {
+            for (int j = 0; j < r.getHeight(); j++) {
+                int[] pixel = new int[3];
+                pixel = r.getPixel(i, j, pixel); //get our pixel
+                //pixel[0] += 100;
+                //pixel[1] += 100;
+                //pixel[2] += 100;
+                float[] hsb = new float[3];
+                Color.RGBtoHSB(pixel[0], pixel[1], pixel[2], hsb); //Convert to HSB
+                hsb[2] *= 255;
+                hsb[2] -= (float) Math.log(hsb[2] - 255); // put the image through a funky logarithmic filter, to make brights brighter and darks darker.
+                hsb[2] /= 255;
+                float[] rgb = Color.getHSBColor(hsb[0], hsb[1], hsb[2]).getRGBColorComponents(null); 
+                rgb[0] *= 255;
+                rgb[1] *= 255;
+                rgb[2] *= 255;
+                r.setPixel(i, j, rgb);
+            }
+        }
+        System.out.println(r);
+
+        BufferedImage b = new BufferedImage(rawImage.getBufferedImage().getWidth(), rawImage.getBufferedImage().getHeight(), BufferedImage.TYPE_INT_RGB);
+        b.setData(r);
+
+        //rawImage.getBufferedImage().setData((Raster) r);
+
+        rawImage = new WPIColorImage(b);
+
+        CanvasFrame realRawImage = new CanvasFrame("Real Raw Image");
+        realRawImage.showImage(rawImage.getBufferedImage());
+
         // Get the raw IplImages for OpenCV
         IplImage input = DaisyExtensions.getIplImage(rawImage);
+
 
         // Convert to HSV color space
         opencv_imgproc.cvCvtColor(input, hsv, opencv_imgproc.CV_BGR2HSV);
@@ -241,7 +281,7 @@ public class DaisyCVWidget extends WPICameraExtension
         polygons = new ArrayList<WPIPolygon>();
         for (WPIContour c : contours)
         {
-            System.out.println("Contour: X: " + c.getX() + " Y: " + c.getY());
+            //System.out.println("Contour: X: " + c.getX() + " Y: " + c.getY());
             rawImage.drawPoint(new WPIPoint(c.getX(), c.getY()), WPIColor.BLUE, 5);
             double ratio = ((double) c.getHeight()) / ((double) c.getWidth());
             if (ratio < 1.0 && ratio > 0.5 && c.getWidth() > kMinWidth && c.getWidth() < kMaxWidth)
@@ -255,7 +295,7 @@ public class DaisyCVWidget extends WPICameraExtension
 
         for (WPIPolygon p : polygons)
         {
-            System.out.println("Convex: " + p.isConvex() + " Verts: " + p.getNumVertices()); 
+            //System.out.println("Convex: " + p.isConvex() + " Verts: " + p.getNumVertices()); 
             if (p.isConvex() && p.getNumVertices() == 4)
             {
 
