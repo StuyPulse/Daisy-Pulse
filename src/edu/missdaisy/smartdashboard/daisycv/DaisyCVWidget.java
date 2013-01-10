@@ -358,11 +358,11 @@ public class DaisyCVWidget extends WPICameraExtension
             if (!m_debugMode)
             {
 
-                Robot.getTable().beginTransaction();
-                Robot.getTable().putBoolean("found", true);
-                Robot.getTable().putDouble("azimuth", azimuth);
-                Robot.getTable().putDouble("rpms", rpms);
-                Robot.getTable().endTransaction();
+                //Robot.getTable().beginTransaction();
+                //Robot.getTable().putBoolean("found", true);
+                //Robot.getTable().putDouble("azimuth", azimuth);
+                //Robot.getTable().putDouble("rpms", rpms);
+                //Robot.getTable().endTransaction();
             } else
             {
                 System.out.println("Target found");
