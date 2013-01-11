@@ -204,9 +204,9 @@ public class DaisyCVWidget extends WPICameraExtension
         BufferedImage b = new BufferedImage(rawImage.getBufferedImage().getWidth(), rawImage.getBufferedImage().getHeight(), BufferedImage.TYPE_INT_RGB);
         b.setData(r);
 
-        fred = IplImage.createFrom(b);
-        fred = fred.nChannels(1);
-        PulseImage logImage = new PulseImage(fred);
+        logFiltered = IplImage.createFrom(b);
+        logFiltered = logFiltered.nChannels(1);
+        PulseImage logImage = new PulseImage(logFiltered);
 
         CanvasFrame logImageFrame = new CanvasFrame("Log Image");
         logImageFrame.showImage(logImage.getBufferedImage());
@@ -250,7 +250,7 @@ public class DaisyCVWidget extends WPICameraExtension
         CanvasFrame asdf = new CanvasFrame("prepostbinthing");
         asdf.showImage(bin.getBufferedImage());
 
-        opencv_core.cvOr(fred, bin, bin, null);
+        opencv_core.cvOr(logFiltered, bin, bin, null);
         opencv_core.cvOr(bin, sat, bin, null);
         opencv_core.cvOr(bin, val, bin, null);
 
