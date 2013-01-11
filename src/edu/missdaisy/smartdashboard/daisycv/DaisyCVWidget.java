@@ -80,7 +80,7 @@ public class DaisyCVWidget extends WPICameraExtension
     private IplImage hue;
     private IplImage sat;
     private IplImage val;
-    private IplImage fred;
+    private IplImage logFiltered;
     private WPIPoint linePt1;
     private WPIPoint linePt2;
     private int horizontalOffsetPixels;
@@ -170,7 +170,7 @@ public class DaisyCVWidget extends WPICameraExtension
             hue = IplImage.create(size, 8, 1);
             sat = IplImage.create(size, 8, 1);
             val = IplImage.create(size, 8, 1);
-            fred = IplImage.create(size, 8, 1);
+            logFiltered = IplImage.create(size, 8, 1);
             horizontalOffsetPixels =  (int)Math.round(kShooterOffsetDeg*(size.width()/kHorizontalFOVDeg));
             linePt1 = new WPIPoint(size.width()/2+horizontalOffsetPixels,size.height()-1);
             linePt2 = new WPIPoint(size.width()/2+horizontalOffsetPixels,0);
