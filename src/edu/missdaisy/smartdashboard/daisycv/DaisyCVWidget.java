@@ -201,10 +201,10 @@ public class DaisyCVWidget extends WPICameraExtension
         }
         //System.out.println(r);
 
-        BufferedImage b = new BufferedImage(rawImage.getBufferedImage().getWidth(), rawImage.getBufferedImage().getHeight(), BufferedImage.TYPE_INT_RGB);
-        b.setData(r);
+        BufferedImage bufferedImage = new BufferedImage(rawImage.getBufferedImage().getWidth(), rawImage.getBufferedImage().getHeight(), BufferedImage.TYPE_INT_RGB);
+        bufferedImage.setData(r);
 
-        logFiltered = IplImage.createFrom(b);
+        logFiltered = IplImage.createFrom(bufferedImage);
         logFiltered = logFiltered.nChannels(1);
         PulseImage logImage = new PulseImage(logFiltered);
 
