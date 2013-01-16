@@ -51,8 +51,8 @@ public class DaisyCVWidget extends WPICameraExtension
     private WPIColor targetColor = new WPIColor(0, 255, 0);
 
     // Constants that need to be tuned
-    private static final double kNearlyHorizontalSlope = Math.tan(Math.toRadians(20));
-    private static final double kNearlyVerticalSlope = Math.tan(Math.toRadians(90-20));
+    private static final double kNearlyHorizontalSlope = Math.tan(Math.toRadians(25));
+    private static final double kNearlyVerticalSlope = Math.tan(Math.toRadians(90-25));
     private static final int kMinWidth = 20;
     private static final int kMaxWidth = 200;
     private static final double kRangeOffset = 0.0;
