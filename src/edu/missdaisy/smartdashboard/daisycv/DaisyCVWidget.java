@@ -372,6 +372,8 @@ public class DaisyCVWidget extends WPICameraExtension
                 System.out.println("azimuth: " + azimuth);
                 System.out.println("range: " + range);
                 System.out.println("rpms: " + rpms);
+                System.out.println("height: " + square.getHeight());
+                System.out.println("width: " + square.getWidth());
             }
             rawImage.drawPolygon(square, targetColor, 7);
         } else
