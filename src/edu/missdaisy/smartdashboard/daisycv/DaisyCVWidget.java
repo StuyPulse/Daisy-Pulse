@@ -287,6 +287,7 @@ public class DaisyCVWidget extends WPICameraExtension
             //System.out.println("Contour: X: " + c.getX() + " Y: " + c.getY());
             rawImage.drawPoint(new WPIPoint(c.getX(), c.getY()), WPIColor.BLUE, 5);
             double ratio = ((double) c.getHeight()) / ((double) c.getWidth());
+            // TODO: change magic numbers to match new targets sizes in 2013
             if (ratio < 1.0 && ratio > 0.5 && c.getWidth() > kMinWidth && c.getWidth() < kMaxWidth)
             {
                 polygons.add(c.approxPolygon(20));
