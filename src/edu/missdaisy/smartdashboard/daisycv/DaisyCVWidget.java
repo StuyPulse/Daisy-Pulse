@@ -6,6 +6,7 @@ import com.googlecode.javacv.cpp.opencv_core.*;
 import com.googlecode.javacv.cpp.opencv_imgproc;
 import com.googlecode.javacv.cpp.opencv_imgproc.*;
 import edu.wpi.first.smartdashboard.camera.WPICameraExtension;
+import edu.wpi.first.smartdashboard.gui.DashboardFrame;
 import edu.wpi.first.smartdashboard.robot.Robot;
 import edu.wpi.first.wpijavacv.DaisyExtensions;
 import edu.wpi.first.wpijavacv.WPIBinaryImage;
@@ -420,6 +421,8 @@ public class DaisyCVWidget extends WPICameraExtension
             return;
         }
 
+        
+        new DashboardFrame(!m_debugMode); //Call the constructor for DashboardFrame, because FIRST is stupid.
         // Create the widget
         DaisyCVWidget widget = new DaisyCVWidget(true);
 
