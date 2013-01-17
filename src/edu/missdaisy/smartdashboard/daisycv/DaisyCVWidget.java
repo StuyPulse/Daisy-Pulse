@@ -52,12 +52,12 @@ public class DaisyCVWidget extends WPICameraExtension
     private WPIColor targetColor = new WPIColor(0, 255, 0);
 
     // Constants that need to be tuned
-    private static final double kNearlyHorizontalSlope = Math.tan(Math.toRadians(25));
-    private static final double kNearlyVerticalSlope = Math.tan(Math.toRadians(90-25));
+    private static final double kNearlyHorizontalSlope = Math.tan(Math.toRadians(14));
+    private static final double kNearlyVerticalSlope = Math.tan(Math.toRadians(90-15));
     private static final int kMinWidth = 20;
     private static final int kMaxWidth = 200;
     private static final double kRangeOffset = 0.0;
-    private static final int kHoleClosingIterations = 9;
+    private static final int kHoleClosingIterations = 7;
 
     private static final double kShooterOffsetDeg = -1.55;
     private static final double kHorizontalFOVDeg = 47.0;
@@ -69,7 +69,7 @@ public class DaisyCVWidget extends WPICameraExtension
 
     private TreeMap<Double, Double> rangeTable;
 
-    private boolean m_debugMode = true;
+    private static boolean m_debugMode = true;
 
     // Store JavaCV temporaries as members to reduce memory management during processing
     private CvSize size = null;
@@ -177,8 +177,6 @@ public class DaisyCVWidget extends WPICameraExtension
             linePt2 = new WPIPoint(size.width()/2+horizontalOffsetPixels,0);
         }
 
-
-
         WritableRaster r = (WritableRaster) rawImage.getBufferedImage().getData(); //We need this to write to/from an image
 
         for (int i = 0; i < r.getWidth(); i++) {
@@ -217,15 +215,15 @@ public class DaisyCVWidget extends WPICameraExtension
 
 
         // Convert to HSV color space
-        opencv_imgproc.cvCvtColor(input, hsv, opencv_imgproc.CV_BGR2HSV);
+        opencv_imgproc.cvCvtColor(input, hsv, opencv_imgproc.CV_BGR2HLS);
         opencv_core.cvSplit(hsv, hue, sat, val, null);
 
         // Threshold each component separately
         // Hue
         // NOTE: Red is at the end of the color space, so you need to OR together
         // a thresh and inverted thresh in order to get points that are red
-        int targetValue = 50;
-        int variance = 30;
+        int targetValue = 30;
+        int variance = 2;
         opencv_imgproc.cvThreshold(hue, bin, targetValue-variance, 255, opencv_imgproc.CV_THRESH_BINARY);
         opencv_imgproc.cvThreshold(hue, hue, targetValue+variance, 255, opencv_imgproc.CV_THRESH_BINARY_INV);
 
@@ -252,7 +250,7 @@ public class DaisyCVWidget extends WPICameraExtension
         asdf.showImage(bin.getBufferedImage());
 
         opencv_core.cvOr(logFiltered, bin, bin, null);
-        opencv_core.cvOr(bin, sat, bin, null);
+        //opencv_core.cvOr(bin, sat, bin, null);
         opencv_core.cvOr(bin, val, bin, null);
 
         CanvasFrame hsvas = new CanvasFrame("hsv");
@@ -291,6 +289,11 @@ public class DaisyCVWidget extends WPICameraExtension
             // TODO: change magic numbers to match new targets sizes in 2013
             if (ratio < 1.0 && ratio > 0.5 && c.getWidth() > kMinWidth && c.getWidth() < kMaxWidth)
             {
+                WPIPolygon p = c.approxPolygon(20);
+                if (p.isConvex() && p.getNumVertices() == 4)
+                {
+                    System.out.println("Ratio: " + ratio);
+                }
                 polygons.add(c.approxPolygon(20));
             }
         }
