@@ -1,5 +1,6 @@
 *.class
 *.jar
+.ant_targets
 .DS_Store
 build/
 dist/
