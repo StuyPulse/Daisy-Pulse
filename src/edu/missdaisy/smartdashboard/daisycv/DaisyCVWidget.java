@@ -425,7 +425,7 @@ public class DaisyCVWidget extends WPICameraExtension
         }
 
         
-        new DashboardFrame(!m_debugMode); //Call the constructor for DashboardFrame, because FIRST is stupid.
+        //new DashboardFrame(!m_debugMode); //Call the constructor for DashboardFrame, because FIRST is stupid.
         // Create the widget
         DaisyCVWidget widget = new DaisyCVWidget(true);
 
