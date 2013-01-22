@@ -96,6 +96,10 @@ public class DaisyCVWidget extends WPICameraExtension
         m_debugMode = debug;
         morphKernel = IplConvKernel.create(3, 3, 1, 1, opencv_imgproc.CV_SHAPE_RECT, null);
 
+        // Put the mode String in the SmartDashboard.
+        if (!m_debugMode)
+            Robot.getTable().putString("mode", "result");
+
         rangeTable = new TreeMap<Double,Double>();
         //rangeTable.put(110.0, 3800.0+kRangeOffset);
         //rangeTable.put(120.0, 3900.0+kRangeOffset);
@@ -207,8 +211,8 @@ public class DaisyCVWidget extends WPICameraExtension
         logFiltered = logFiltered.nChannels(1);
         PulseImage logImage = new PulseImage(logFiltered);
 
-        CanvasFrame logImageFrame = new CanvasFrame("Log Image");
-        logImageFrame.showImage(logImage.getBufferedImage());
+        //CanvasFrame logImageFrame = new CanvasFrame("Log Image");
+        //logImageFrame.showImage(logImage.getBufferedImage());
 
         // Get the raw IplImages for OpenCV
         IplImage input = DaisyExtensions.getIplImage(rawImage);
@@ -230,11 +234,11 @@ public class DaisyCVWidget extends WPICameraExtension
         //opencv_core.cvNot(bin, bin);
         //opencv_core.cvNot(hue, hue);
 
-        CanvasFrame postNotBin = new CanvasFrame("PostNotBin");
-        postNotBin.showImage(bin.getBufferedImage());
+        //CanvasFrame postNotBin = new CanvasFrame("PostNotBin");
+        //postNotBin.showImage(bin.getBufferedImage());
 
-        CanvasFrame postNotHue = new CanvasFrame("PostNotHue");
-        postNotHue.showImage(hue.getBufferedImage());
+        //CanvasFrame postNotHue = new CanvasFrame("PostNotHue");
+        //postNotHue.showImage(hue.getBufferedImage());
 
         // Saturation
         opencv_imgproc.cvThreshold(sat, sat, 250, 255, opencv_imgproc.CV_THRESH_BINARY);
@@ -246,35 +250,35 @@ public class DaisyCVWidget extends WPICameraExtension
         // part only contain pixels that we care about
         opencv_core.cvAnd(hue, bin, bin, null);
 
-        CanvasFrame asdf = new CanvasFrame("prepostbinthing");
-        asdf.showImage(bin.getBufferedImage());
+        //CanvasFrame asdf = new CanvasFrame("prepostbinthing");
+        //asdf.showImage(bin.getBufferedImage());
 
         opencv_core.cvOr(logFiltered, bin, bin, null);
         //opencv_core.cvOr(bin, sat, bin, null);
         opencv_core.cvOr(bin, val, bin, null);
 
-        CanvasFrame hsvas = new CanvasFrame("hsv");
-        hsvas.showImage(hsv.getBufferedImage());
+        //CanvasFrame hsvas = new CanvasFrame("hsv");
+        //hsvas.showImage(hsv.getBufferedImage());
 
-        CanvasFrame hueas = new CanvasFrame("hue");
-        hueas.showImage(hue.getBufferedImage());
+        //CanvasFrame hueas = new CanvasFrame("hue");
+        //hueas.showImage(hue.getBufferedImage());
 
-        CanvasFrame satas = new CanvasFrame("sat");
-        satas.showImage(sat.getBufferedImage());
+        //CanvasFrame satas = new CanvasFrame("sat");
+        //satas.showImage(sat.getBufferedImage());
 
-        CanvasFrame valas = new CanvasFrame("val");
-        valas.showImage(val.getBufferedImage());
+        //CanvasFrame valas = new CanvasFrame("val");
+        //valas.showImage(val.getBufferedImage());
 
         // Uncomment the next two lines to see the raw binary image
-        CanvasFrame result = new CanvasFrame("binary");
-        result.showImage(bin.getBufferedImage());
+        //CanvasFrame result = new CanvasFrame("binary");
+        //result.showImage(bin.getBufferedImage());
 
         // Fill in any gaps using binary morphology
         opencv_imgproc.cvMorphologyEx(bin, bin, null, morphKernel, opencv_imgproc.CV_MOP_CLOSE, kHoleClosingIterations);
 
         // Uncomment the next two lines to see the image post-morphology
-        CanvasFrame result2 = new CanvasFrame("morph");
-        result2.showImage(bin.getBufferedImage());
+        //CanvasFrame result2 = new CanvasFrame("morph");
+        //result2.showImage(bin.getBufferedImage());
 
         // Find contours
         WPIBinaryImage binWpi = DaisyExtensions.makeWPIBinaryImage(bin);
@@ -363,11 +367,12 @@ public class DaisyCVWidget extends WPICameraExtension
             if (!m_debugMode)
             {
 
-                //Robot.getTable().beginTransaction();
-                //Robot.getTable().putBoolean("found", true);
-                //Robot.getTable().putDouble("azimuth", azimuth);
-                //Robot.getTable().putDouble("rpms", rpms);
-                //Robot.getTable().endTransaction();
+                Robot.getTable().beginTransaction();
+                Robot.getTable().putBoolean("found", true);
+                Robot.getTable().putDouble("azimuth", azimuth);
+                Robot.getTable().putDouble("rpms", rpms);
+                Robot.getTable().getString("mode");
+                Robot.getTable().endTransaction();
             } else
             {
                 System.out.println("Target found");
@@ -399,6 +404,20 @@ public class DaisyCVWidget extends WPICameraExtension
 
         //System.gc();
 
+        //Choose a frame to show in the SmartDashboard
+        if (!m_debugMode) {
+            String modeChoice = Robot.getTable().getString("mode");
+                if (modeChoice.equals("result"))
+                    return rawImage;
+                if (modeChoice.equals( "bin"))
+                    return new PulseColorImage(bin.getBufferedImage());
+                if (modeChoice.equals( "log"))
+                    return new PulseColorImage(logFiltered.getBufferedImage());
+                if (modeChoice.equals( "hue"))
+                    return new PulseColorImage(hue.getBufferedImage());
+                if (modeChoice.equals( "sat"))
+                    return new PulseColorImage(sat.getBufferedImage());
+        }
         return rawImage;
     }
 
