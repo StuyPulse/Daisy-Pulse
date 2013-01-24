@@ -80,6 +80,9 @@ public class DaisyCVWidget extends WPICameraExtension
     private IplImage hsv;
     private IplImage hue;
     private IplImage sat;
+    private IplImage upper;
+    private IplImage bottom;
+    private IplImage combined;
     private IplImage val;
     private IplImage logFiltered;
     private WPIPoint linePt1;
@@ -97,8 +100,12 @@ public class DaisyCVWidget extends WPICameraExtension
         morphKernel = IplConvKernel.create(3, 3, 1, 1, opencv_imgproc.CV_SHAPE_RECT, null);
 
         // Put the mode String in the SmartDashboard.
-        if (!m_debugMode)
+        if (!m_debugMode) {
             Robot.getTable().putString("mode", "result");
+            Robot.getTable().putInt("target", 100);
+            Robot.getTable().putInt("variance", 10);
+
+        }
 
         rangeTable = new TreeMap<Double,Double>();
         //rangeTable.put(110.0, 3800.0+kRangeOffset);
@@ -173,6 +180,9 @@ public class DaisyCVWidget extends WPICameraExtension
             bin = IplImage.create(size, 8, 1);
             hsv = IplImage.create(size, 8, 3);
             hue = IplImage.create(size, 8, 1);
+            upper = IplImage.create(size, 8, 1);
+            bottom = IplImage.create(size, 8, 1);
+            combined = IplImage.create(size, 8, 1);
             sat = IplImage.create(size, 8, 1);
             val = IplImage.create(size, 8, 1);
             logFiltered = IplImage.create(size, 8, 1);
@@ -228,8 +238,16 @@ public class DaisyCVWidget extends WPICameraExtension
         // a thresh and inverted thresh in order to get points that are red
         int targetValue = 30;
         int variance = 2;
-        opencv_imgproc.cvThreshold(hue, bin, targetValue-variance, 255, opencv_imgproc.CV_THRESH_BINARY);
-        opencv_imgproc.cvThreshold(hue, hue, targetValue+variance, 255, opencv_imgproc.CV_THRESH_BINARY_INV);
+        if (!m_debugMode) {
+            targetValue = Robot.getTable().getInt("target");
+            variance = Robot.getTable().getInt("variance");
+        }
+        opencv_imgproc.cvThreshold(hue, upper, targetValue-variance, 255, opencv_imgproc.CV_THRESH_BINARY);
+        opencv_imgproc.cvThreshold(hue, bottom, targetValue+variance, 255, opencv_imgproc.CV_THRESH_BINARY_INV);
+
+        opencv_core.cvAnd(upper, bottom, combined, null);
+
+        //opencv_core.cvNot(combined, combined);
 
         //opencv_core.cvNot(bin, bin);
         //opencv_core.cvNot(hue, hue);
@@ -248,14 +266,16 @@ public class DaisyCVWidget extends WPICameraExtension
 
         // Combine the results to obtain our binary image which should for the most
         // part only contain pixels that we care about
-        opencv_core.cvAnd(hue, bin, bin, null);
+        //opencv_core.cvAnd(upper, bottom, bin, null);
+        
+        opencv_core.cvCopy(combined, bin);
 
         //CanvasFrame asdf = new CanvasFrame("prepostbinthing");
         //asdf.showImage(bin.getBufferedImage());
 
         opencv_core.cvOr(logFiltered, bin, bin, null);
-        //opencv_core.cvOr(bin, sat, bin, null);
-        opencv_core.cvOr(bin, val, bin, null);
+        opencv_core.cvOr(bin, sat, bin, null);
+        opencv_core.cvAnd(bin, val, bin, null);
 
         //CanvasFrame hsvas = new CanvasFrame("hsv");
         //hsvas.showImage(hsv.getBufferedImage());
@@ -291,7 +311,7 @@ public class DaisyCVWidget extends WPICameraExtension
             rawImage.drawPoint(new WPIPoint(c.getX(), c.getY()), WPIColor.BLUE, 5);
             double ratio = ((double) c.getHeight()) / ((double) c.getWidth());
             // TODO: change magic numbers to match new targets sizes in 2013
-            if (ratio < 1.0 && ratio > 0.5 && c.getWidth() > kMinWidth && c.getWidth() < kMaxWidth)
+            if (ratio < 3.0 && ratio > 0.5 && c.getWidth() > kMinWidth && c.getWidth() < kMaxWidth)
             {
                 WPIPolygon p = c.approxPolygon(20);
                 if (p.isConvex() && p.getNumVertices() == 4)
@@ -411,12 +431,24 @@ public class DaisyCVWidget extends WPICameraExtension
                     return rawImage;
                 if (modeChoice.equals( "bin"))
                     return new PulseColorImage(bin.getBufferedImage());
+                if (modeChoice.equals( "input"))
+                    return new PulseColorImage(input.getBufferedImage());
                 if (modeChoice.equals( "log"))
                     return new PulseColorImage(logFiltered.getBufferedImage());
+                if (modeChoice.equals( "hsv"))
+                    return new PulseColorImage(hsv.getBufferedImage());
                 if (modeChoice.equals( "hue"))
                     return new PulseColorImage(hue.getBufferedImage());
+                if (modeChoice.equals( "combined"))
+                    return new PulseColorImage(combined.getBufferedImage());
+                if (modeChoice.equals( "upper"))
+                    return new PulseColorImage(upper.getBufferedImage());
+                if (modeChoice.equals( "bottom"))
+                    return new PulseColorImage(bottom.getBufferedImage());
                 if (modeChoice.equals( "sat"))
                     return new PulseColorImage(sat.getBufferedImage());
+                if (modeChoice.equals( "val"))
+                    return new PulseColorImage(val.getBufferedImage());
         }
         return rawImage;
     }
