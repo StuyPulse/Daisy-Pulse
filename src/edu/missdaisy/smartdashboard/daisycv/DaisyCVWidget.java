@@ -81,9 +81,9 @@ public class DaisyCVWidget extends WPICameraExtension
     private IplImage hue;
     private IplImage sat;
     private IplImage upper;
-    private IplImage bottom;
+    private IplImage lower;
     private IplImage combined;
-    private IplImage val;
+    private IplImage lightness;
     private IplImage logFiltered;
     private WPIPoint linePt1;
     private WPIPoint linePt2;
@@ -181,10 +181,10 @@ public class DaisyCVWidget extends WPICameraExtension
             hsv = IplImage.create(size, 8, 3);
             hue = IplImage.create(size, 8, 1);
             upper = IplImage.create(size, 8, 1);
-            bottom = IplImage.create(size, 8, 1);
+            lower = IplImage.create(size, 8, 1);
             combined = IplImage.create(size, 8, 1);
             sat = IplImage.create(size, 8, 1);
-            val = IplImage.create(size, 8, 1);
+            lightness = IplImage.create(size, 8, 1);
             logFiltered = IplImage.create(size, 8, 1);
             horizontalOffsetPixels =  (int)Math.round(kShooterOffsetDeg*(size.width()/kHorizontalFOVDeg));
             linePt1 = new WPIPoint(size.width()/2+horizontalOffsetPixels,size.height()-1);
@@ -230,7 +230,7 @@ public class DaisyCVWidget extends WPICameraExtension
 
         // Convert to HSV color space
         opencv_imgproc.cvCvtColor(input, hsv, opencv_imgproc.CV_BGR2HLS);
-        opencv_core.cvSplit(hsv, hue, sat, val, null);
+        opencv_core.cvSplit(hsv, hue, sat, lightness, null);
 
         // Threshold each component separately
         // Hue
@@ -243,9 +243,9 @@ public class DaisyCVWidget extends WPICameraExtension
             variance = Robot.getTable().getInt("variance");
         }
         opencv_imgproc.cvThreshold(hue, upper, targetValue-variance, 255, opencv_imgproc.CV_THRESH_BINARY);
-        opencv_imgproc.cvThreshold(hue, bottom, targetValue+variance, 255, opencv_imgproc.CV_THRESH_BINARY_INV);
+        opencv_imgproc.cvThreshold(hue, lower, targetValue+variance, 255, opencv_imgproc.CV_THRESH_BINARY_INV);
 
-        opencv_core.cvAnd(upper, bottom, combined, null);
+        opencv_core.cvAnd(upper, lower, combined, null);
 
         //opencv_core.cvNot(combined, combined);
 
@@ -262,11 +262,11 @@ public class DaisyCVWidget extends WPICameraExtension
         opencv_imgproc.cvThreshold(sat, sat, 250, 255, opencv_imgproc.CV_THRESH_BINARY);
 
         // Value
-        opencv_imgproc.cvThreshold(val, val, 150, 255, opencv_imgproc.CV_THRESH_BINARY);
+        opencv_imgproc.cvThreshold(lightness, lightness, 150, 255, opencv_imgproc.CV_THRESH_BINARY);
 
         // Combine the results to obtain our binary image which should for the most
         // part only contain pixels that we care about
-        //opencv_core.cvAnd(upper, bottom, bin, null);
+        //opencv_core.cvAnd(upper, lower, bin, null);
         
         opencv_core.cvCopy(combined, bin);
 
@@ -275,7 +275,7 @@ public class DaisyCVWidget extends WPICameraExtension
 
         opencv_core.cvOr(logFiltered, bin, bin, null);
         opencv_core.cvOr(bin, sat, bin, null);
-        opencv_core.cvAnd(bin, val, bin, null);
+        opencv_core.cvAnd(bin, lightness, bin, null);
 
         //CanvasFrame hsvas = new CanvasFrame("hsv");
         //hsvas.showImage(hsv.getBufferedImage());
@@ -286,8 +286,8 @@ public class DaisyCVWidget extends WPICameraExtension
         //CanvasFrame satas = new CanvasFrame("sat");
         //satas.showImage(sat.getBufferedImage());
 
-        //CanvasFrame valas = new CanvasFrame("val");
-        //valas.showImage(val.getBufferedImage());
+        //CanvasFrame valas = new CanvasFrame("lightness");
+        //valas.showImage(lightness.getBufferedImage());
 
         // Uncomment the next two lines to see the raw binary image
         //CanvasFrame result = new CanvasFrame("binary");
@@ -443,12 +443,12 @@ public class DaisyCVWidget extends WPICameraExtension
                     return new PulseColorImage(combined.getBufferedImage());
                 if (modeChoice.equals( "upper"))
                     return new PulseColorImage(upper.getBufferedImage());
-                if (modeChoice.equals( "bottom"))
-                    return new PulseColorImage(bottom.getBufferedImage());
+                if (modeChoice.equals( "lower"))
+                    return new PulseColorImage(lower.getBufferedImage());
                 if (modeChoice.equals( "sat"))
                     return new PulseColorImage(sat.getBufferedImage());
-                if (modeChoice.equals( "val"))
-                    return new PulseColorImage(val.getBufferedImage());
+                if (modeChoice.equals( "lightness"))
+                    return new PulseColorImage(lightness.getBufferedImage());
         }
         return rawImage;
     }
