@@ -57,7 +57,7 @@ public class DaisyCVWidget extends WPICameraExtension
     private static final int kMinWidth = 20;
     private static final int kMaxWidth = 200;
     private static final double kRangeOffset = 0.0;
-    private static final int kHoleClosingIterations = 7;
+    private static final int kHoleClosingIterations = 10;
 
     private static final double kShooterOffsetDeg = -1.55;
     private static final double kHorizontalFOVDeg = 47.0;
@@ -208,7 +208,7 @@ public class DaisyCVWidget extends WPICameraExtension
                 float[] rgb = Color.getHSBColor(hsb[0], hsb[1], hsb[2]).getRGBColorComponents(null); 
                 rgb[0] *= 255;
                 rgb[1] *= 255;
-                rgb[2] *= 255;
+                rgb[2] *= 225;
                 r.setPixel(i, j, rgb);
             }
         }
@@ -230,7 +230,7 @@ public class DaisyCVWidget extends WPICameraExtension
 
         // Convert to HSV color space
         opencv_imgproc.cvCvtColor(input, hsv, opencv_imgproc.CV_BGR2HLS);
-        opencv_core.cvSplit(hsv, hue, sat, lightness, null);
+        opencv_core.cvSplit(hsv, hue, lightness, sat, null);
 
         // Threshold each component separately
         // Hue
@@ -311,7 +311,7 @@ public class DaisyCVWidget extends WPICameraExtension
             rawImage.drawPoint(new WPIPoint(c.getX(), c.getY()), WPIColor.BLUE, 5);
             double ratio = ((double) c.getHeight()) / ((double) c.getWidth());
             // TODO: change magic numbers to match new targets sizes in 2013
-            if (ratio < 3.0 && ratio > 0.5 && c.getWidth() > kMinWidth && c.getWidth() < kMaxWidth)
+            if (ratio < 10.0 && ratio > 0.0 && c.getWidth() > kMinWidth && c.getWidth() < kMaxWidth)
             {
                 WPIPolygon p = c.approxPolygon(20);
                 if (p.isConvex() && p.getNumVertices() == 4)
