@@ -221,8 +221,10 @@ public class DaisyCVWidget extends WPICameraExtension
         logFiltered = logFiltered.nChannels(1);
         PulseImage logImage = new PulseImage(logFiltered);
 
-        //CanvasFrame logImageFrame = new CanvasFrame("Log Image");
-        //logImageFrame.showImage(logImage.getBufferedImage());
+        if (m_debugMode) {
+            CanvasFrame logImageFrame = new CanvasFrame("Log Image");
+            logImageFrame.showImage(logImage.getBufferedImage());
+        }
 
         // Get the raw IplImages for OpenCV
         IplImage input = DaisyExtensions.getIplImage(rawImage);
@@ -270,35 +272,41 @@ public class DaisyCVWidget extends WPICameraExtension
         
         opencv_core.cvCopy(combined, bin);
 
-        //CanvasFrame asdf = new CanvasFrame("prepostbinthing");
-        //asdf.showImage(bin.getBufferedImage());
+        if (m_debugMode) {
+            CanvasFrame asdf = new CanvasFrame("prepostbinthing");
+            asdf.showImage(bin.getBufferedImage());
+        }
 
         opencv_core.cvOr(logFiltered, bin, bin, null);
         opencv_core.cvOr(bin, sat, bin, null);
         opencv_core.cvAnd(bin, lightness, bin, null);
 
-        //CanvasFrame hsvas = new CanvasFrame("hsv");
-        //hsvas.showImage(hsv.getBufferedImage());
+        if (m_debugMode) {
+            CanvasFrame hsvas = new CanvasFrame("hsv");
+            hsvas.showImage(hsv.getBufferedImage());
 
-        //CanvasFrame hueas = new CanvasFrame("hue");
-        //hueas.showImage(hue.getBufferedImage());
+            CanvasFrame hueas = new CanvasFrame("hue");
+            hueas.showImage(hue.getBufferedImage());
 
-        //CanvasFrame satas = new CanvasFrame("sat");
-        //satas.showImage(sat.getBufferedImage());
+            CanvasFrame satas = new CanvasFrame("sat");
+            satas.showImage(sat.getBufferedImage());
 
-        //CanvasFrame valas = new CanvasFrame("lightness");
-        //valas.showImage(lightness.getBufferedImage());
+            CanvasFrame valas = new CanvasFrame("lightness");
+            valas.showImage(lightness.getBufferedImage());
 
-        // Uncomment the next two lines to see the raw binary image
-        //CanvasFrame result = new CanvasFrame("binary");
-        //result.showImage(bin.getBufferedImage());
+            CanvasFrame result = new CanvasFrame("binary");
+            result.showImage(bin.getBufferedImage());
+
+        }
 
         // Fill in any gaps using binary morphology
         opencv_imgproc.cvMorphologyEx(bin, bin, null, morphKernel, opencv_imgproc.CV_MOP_CLOSE, kHoleClosingIterations);
 
         // Uncomment the next two lines to see the image post-morphology
-        //CanvasFrame result2 = new CanvasFrame("morph");
-        //result2.showImage(bin.getBufferedImage());
+        if (m_debugMode) {
+            CanvasFrame result2 = new CanvasFrame("morph");
+            result2.showImage(bin.getBufferedImage());
+        }
 
         // Find contours
         WPIBinaryImage binWpi = DaisyExtensions.makeWPIBinaryImage(bin);
