@@ -108,9 +108,9 @@ public class DaisyCVWidget extends WPICameraExtension
         }
 
         rangeTable = new TreeMap<Double,Double>();
-        //rangeTable.put(110.0, 3800.0+kRangeOffset);
-        //rangeTable.put(120.0, 3900.0+kRangeOffset);
-        //rangeTable.put(130.0, 4000.0+kRangeOffset);
+        rangeTable.put(110.0, 3800.0+kRangeOffset);
+        rangeTable.put(120.0, 3900.0+kRangeOffset);
+        rangeTable.put(130.0, 4000.0+kRangeOffset);
         rangeTable.put(140.0, 3434.0+kRangeOffset);
         rangeTable.put(150.0, 3499.0+kRangeOffset);
         rangeTable.put(160.0, 3544.0+kRangeOffset);
