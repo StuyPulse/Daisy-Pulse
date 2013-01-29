@@ -197,9 +197,6 @@ public class DaisyCVWidget extends WPICameraExtension
             for (int j = 0; j < r.getHeight(); j++) {
                 int[] pixel = new int[3];
                 pixel = r.getPixel(i, j, pixel); //get our pixel
-                //pixel[0] += 100;
-                //pixel[1] += 100;
-                //pixel[2] += 100;
                 float[] hsb = new float[3];
                 Color.RGBtoHSB(pixel[0], pixel[1], pixel[2], hsb); //Convert to HSB
                 hsb[2] *= 255;
@@ -254,11 +251,13 @@ public class DaisyCVWidget extends WPICameraExtension
         //opencv_core.cvNot(bin, bin);
         //opencv_core.cvNot(hue, hue);
 
-        //CanvasFrame postNotBin = new CanvasFrame("PostNotBin");
-        //postNotBin.showImage(bin.getBufferedImage());
+        if (m_debugMode) {
+            CanvasFrame postNotBin = new CanvasFrame("PostNotBin");
+            postNotBin.showImage(bin.getBufferedImage());
 
-        //CanvasFrame postNotHue = new CanvasFrame("PostNotHue");
-        //postNotHue.showImage(hue.getBufferedImage());
+            CanvasFrame postNotHue = new CanvasFrame("PostNotHue");
+            postNotHue.showImage(hue.getBufferedImage());
+        }
 
         // Saturation
         opencv_imgproc.cvThreshold(sat, sat, 250, 255, opencv_imgproc.CV_THRESH_BINARY);
@@ -394,7 +393,6 @@ public class DaisyCVWidget extends WPICameraExtension
 
             if (!m_debugMode)
             {
-
                 Robot.getTable().beginTransaction();
                 Robot.getTable().putBoolean("found", true);
                 Robot.getTable().putDouble("azimuth", azimuth);
